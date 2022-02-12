@@ -24,7 +24,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@rari-capital/solmate": "^6.2.0",
     "dotenv": "^8.6.0",
     "eth-gas-reporter": "^0.2.22",
     "web3": "^1.4.0",

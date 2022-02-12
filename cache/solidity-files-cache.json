@@ -40,7 +40,7 @@
       ]
     },
     "/Users/aaronwong/Documents/repos/blockchain/IdenDeFi/contracts/contracts/tokens/ERC721.sol": {
-      "lastModificationDate": 1644643795001,
+      "lastModificationDate": 1644643934905,
       "contentHash": "0fbbf764a64f0ef52115f20d40d18f1f",
       "sourceName": "contracts/tokens/ERC721.sol",
       "solcConfig": {
