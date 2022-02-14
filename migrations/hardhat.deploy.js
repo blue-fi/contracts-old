@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { ethers } = require("hardhat");
+const Arguments = require("../arguments/idf-arguments");
 
 const main = async () => {
   try {
@@ -9,7 +10,7 @@ const main = async () => {
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
     const IdentDeFi = await ethers.getContractFactory("IdentDeFi");
-    const identDeFi = await IdentDeFi.deploy();
+    const identDeFi = await IdentDeFi.deploy(...Arguments);
     await identDeFi.deployed();
     console.log(`deployed to ${identDeFi.address}`);
 

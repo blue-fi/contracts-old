@@ -4,7 +4,7 @@ import '../interfaces/ERC721TokenReceiver.sol';
 import '../interfaces/IERC721.sol';
 import '../libraries/Strings.sol';
 
-contract ERC721 is IERC721{
+contract ERC721 is IERC721 {
   using Strings for uint256;
   // Token name
   string public name;
@@ -58,7 +58,7 @@ contract ERC721 is IERC721{
   function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
     require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
     string memory baseURI = _baseURI();
-    return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
+    return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.uintToString())) : "";
   }
 
   /**
