@@ -2,12 +2,12 @@
 pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
-import './tokens/ERC721.sol';
+import './tokens/ERC721URIStorage.sol';
 import './utils/ownable.sol';
 import './libraries/Strings.sol';
 import "hardhat/console.sol";
 
-contract IdentDeFi is ERC721, Ownable, ChainlinkClient {
+contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
   using Strings for address;
   using Chainlink for Chainlink.Request;
 
@@ -61,24 +61,30 @@ contract IdentDeFi is ERC721, Ownable, ChainlinkClient {
   function requestValidation() internal returns (bytes32 requestId) {
     Chainlink.Request memory req = buildChainlinkRequest(jobId, address(this), this.fulfill.selector);
     // Set the URL to perform the GET request on
-    req.add("get", string(abi.encodePacked(path, msg.sender.addressToString())));
+    req.add("get", string(abi.encodePacked(path, "/account/", msg.sender.addressToString())));
 
     // Define path to value in JSON
-    req.add("path", "RAW.ETH.USD.VOLUME24HOUR");
+    req.add("path", "data.valid");
 
     // Sends the request
     return sendChainlinkRequestTo(oracle, req, fee);
   }
 
   function fulfill(bytes32 _requestId, bool _valid) public recordChainlinkFulfillment(_requestId) {
-    if (_valid) {
-      address account = requestToMint[_requestId];
+    address account = requestToMint[_requestId];
 
+    if (_valid) {
       _counter += 1;
       _mint(account, _counter);
+      _setTokenURI(_counter, string(abi.encodePacked(path, "/account/", msg.sender.addressToString()), "/metadata"));
       _tokens[account] = _counter;
+
+      emit ValidationSuccess(account, _counter);
     } else {
-      // Put fail event response
+      emit InvalidValidation(account);
     }
   }
+
+  event ValidationSuccess(address indexed _account, uint256 indexed _tokenId);
+  event InvalidValidation(address indexed _account);
 }
