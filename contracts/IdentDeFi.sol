@@ -14,11 +14,11 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
 
   string public path;
   address public oracle;
-  bytes public jobId;
+  bytes32 public jobId;
   uint public fee;
   uint public price;
   mapping(address => uint) private _tokens;
-  mapping(bytes => address) private requestToMint;
+  mapping(bytes32 => address) private requestToMint;
   uint private _counter;
 
   modifier onlyOwnerOrHolder(uint tokenId) {
@@ -34,7 +34,7 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
   )
   ERC721("IdentDeFi", "IDF")
   {
-    setPublicChainlinkToken();
+    // setPublicChainlinkToken();
     path = _path;
     oracle = _oracle;
     jobId = 'bc746611ebee40a3989bbe49e12a02b9';
@@ -54,18 +54,18 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
     address owner = ownerOf(tokenId);
     require(owner != address(0), "IdentDeFI::revoke: Invalid token ID");
     delete _tokens[owner];
-    emit TokenRevoked(tokenId, owner);
+    emit TokenRevoked(tokenId, owner, msg.sender);
   }
 
   function mintVerification() payable external {
     // Put price to make request and mint NFT
     require(msg.value >= price, "IdentDeFI::mintVerification: Paid value is insufficiant");
     require(balanceOf(msg.sender) < 1, "IdentDeFI::mintVerification: Only 1 token per address allowed");
-    bytes requestId = requestValidation();
+    bytes32 requestId = requestValidation();
     requestToMint[requestId] = msg.sender;
   }
 
-  function requestValidation() internal returns (bytes requestId) {
+  function requestValidation() internal returns (bytes32 requestId) {
     Chainlink.Request memory req = buildChainlinkRequest(jobId, address(this), this.fulfill.selector);
     // Set the URL to perform the GET request on
     req.add("get", string(abi.encodePacked(path, "/account/", msg.sender.addressToString())));
@@ -75,19 +75,23 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
     return sendChainlinkRequestTo(oracle, req, fee);
   }
 
-  function fulfill(bytes _requestId, bool _valid) public recordChainlinkFulfillment(_requestId) {
+  function fulfill(bytes32 _requestId, bool _valid) public recordChainlinkFulfillment(_requestId) {
     address account = requestToMint[_requestId];
 
     if (_valid) {
-      _counter += 1;
-      _safeMint(account, _counter);
-      _setTokenURI(_counter, string(abi.encodePacked(path, "/account/", account.addressToString(), "/metadata")));
-      _tokens[account] = _counter;
-
-      emit ValidationSuccess(account, _counter);
+      mint(account);
     } else {
       emit InvalidValidation(account);
     }
+  }
+
+  function mint(address account) internal {
+    _counter += 1;
+    _safeMint(account, _counter);
+    _setTokenURI(_counter, string(abi.encodePacked(path, "/account/", account.addressToString(), "/metadata")));
+    _tokens[account] = _counter;
+
+    emit ValidationSuccess(account, _counter);
   }
 
   function _transfer(
@@ -104,7 +108,7 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
     SafeTransfers.safeTransferETH(msg.sender, balance);
   }
 
-  function tokenBalance(address _tokenContract) view external returns (uint) {
+  function tokenBalance(address _tokenContract) view public returns (uint) {
     IERC20 token = IERC20(_tokenContract);
     return token.balanceOf(address(this));
   }
@@ -116,5 +120,5 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
 
   event ValidationSuccess(address indexed _account, uint indexed _tokenId);
   event InvalidValidation(address indexed _account);
-  event TokenRevoked(uint indexed _tokenId, address indexed _account);
+  event TokenRevoked(uint indexed _tokenId, address indexed _account, address indexed _revoker);
 }
