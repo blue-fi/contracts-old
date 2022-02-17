@@ -59,7 +59,7 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
 
   function mintVerification() payable external {
     // Put price to make request and mint NFT
-    require(msg.value >= price, "IdentDeFI::mintVerification: paid value is insufficiant");
+    require(msg.value >= price, "IdentDeFI::mintVerification: Paid value is insufficiant");
     require(balanceOf(msg.sender) < 1, "IdentDeFI::mintVerification: Only 1 token per address allowed");
 
     bytes requestId = requestValidation();
@@ -103,7 +103,7 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
 
   function withdraw(uint _amount) external onlyOwner {
     uint balance = address(this).balance;
-    require(_amount <= balance, "IdentDeFI::withdraw: insufficient balance");
+    require(_amount <= balance, "IdentDeFI::withdraw: Insufficient balance");
     SafeTransfers.safeTransferETH(msg.sender, balance);
   }
 
@@ -113,7 +113,7 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
   }
 
   function withdrawToken(address _tokenContract, uint _amount) external onlyOwner {
-    require(_amount <= tokenBalance(_tokenContract), "IdentDeFI::withdrawToken: insufficient balance");
+    require(_amount <= tokenBalance(_tokenContract), "IdentDeFI::withdrawToken: Insufficient balance");
     SafeTransfers.safeTransfer(_tokenContract, msg.sender, _amount);
   }
 
