@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import 'hardhat/console.sol';
-
 library SafeTransfers {
   function safeTransferETH(address to, uint256 value) internal {
     (bool success, bytes memory data) = to.call{value: value}(new bytes(0));

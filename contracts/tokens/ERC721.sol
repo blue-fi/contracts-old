@@ -4,7 +4,7 @@ import '../interfaces/ERC721TokenReceiver.sol';
 import '../interfaces/IERC721.sol';
 import '../libraries/Strings.sol';
 
-contract ERC721 is IERC721 {
+abstract contract ERC721 is IERC721 {
   using Strings for uint256;
   // Token name
   string public name;

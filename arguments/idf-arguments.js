@@ -5,7 +5,9 @@ const {
   SERVER_URL,
   ORACLE,
   JOB_ID,
-  FEE
+  FEE,
+  PRICE,
+  NETWORK
 } = process.env;
 
 /**
@@ -17,8 +19,8 @@ const {
 // const fee = FEE * 10**18;
 
 module.exports = [
-  SERVER_URL,
+  `${SERVER_URL}${NETWORK}`,
   ORACLE,
-  JOB_ID,
-  ethers.utils.parseEther(`${FEE}`)
+  ethers.utils.parseEther(`${FEE}`),
+  ethers.utils.parseEther(`${PRICE}`)
 ];
