@@ -61,7 +61,6 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
     // Put price to make request and mint NFT
     require(msg.value >= price, "IdentDeFI::mintVerification: Paid value is insufficiant");
     require(balanceOf(msg.sender) < 1, "IdentDeFI::mintVerification: Only 1 token per address allowed");
-
     bytes requestId = requestValidation();
     requestToMint[requestId] = msg.sender;
   }
@@ -70,10 +69,8 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
     Chainlink.Request memory req = buildChainlinkRequest(jobId, address(this), this.fulfill.selector);
     // Set the URL to perform the GET request on
     req.add("get", string(abi.encodePacked(path, "/account/", msg.sender.addressToString())));
-
     // Define path to value in JSON
     req.add("path", "data.valid");
-
     // Sends the request
     return sendChainlinkRequestTo(oracle, req, fee);
   }
