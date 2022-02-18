@@ -85,7 +85,7 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
     }
   }
 
-  function mint(address account) internal {
+  function mint(address account) private {
     _counter += 1;
     _safeMint(account, _counter);
     _setTokenURI(_counter, string(abi.encodePacked(path, "/account/", account.addressToString(), "/metadata")));
