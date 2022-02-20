@@ -71,7 +71,7 @@ describe("IdentDeFi", () => {
       account2
     ] = await ethers.getSigners();
 
-    await expect(identDeFi.connect(account2).mintVerification({value: ethers.utils.parseEther("0.01")})).to.be.revertedWith('IdentDeFI::mintVerification: Paid value is insufficiant');
+    await expect(identDeFi.connect(account2).mintVerification({value: ethers.utils.parseEther("0.1")})).to.be.revertedWith('IdentDeFI::mintVerification: Paid value is insufficiant');
 
     const validationSuccessEvent = new Promise((resolve, reject) => {
       identDeFi.on('ValidationSuccess', (_account, _tokenId, event) => {
@@ -99,7 +99,7 @@ describe("IdentDeFi", () => {
     ] = await ethers.getSigners();
 
     await identDeFi.mint(account2.address);
-    await expect(identDeFi.connect(account2).mintVerification({value: ethers.utils.parseEther("0.1")})).to.be.revertedWith('IdentDeFI::mintVerification: Only 1 token per address allowed');
+    await expect(await identDeFi.connect(account2).mintVerification({value: ethers.utils.parseEther("0.01")})).to.be.revertedWith('IdentDeFI::mintVerification: Only 1 token per address allowed');
   });
 
   it(`All transfers should throw`, async () => {
@@ -202,7 +202,7 @@ describe("IdentDeFi", () => {
 
     await identDeFi.connect(account1).revoke(tokenId3);
     const event2 = await tokenRevokedEvent2;
-
+  
     assert.equal(event2._account, account3.address);
     assert.equal(event2._revoker, account1.address);
     assert.equal(`${event2._tokenId}`, `${tokenId3}`);

@@ -34,7 +34,7 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
   )
   ERC721("IdentDeFi", "IDF")
   {
-    // setPublicChainlinkToken();
+    setPublicChainlinkToken();
     path = _path;
     oracle = _oracle;
     jobId = 'bc746611ebee40a3989bbe49e12a02b9';
@@ -57,8 +57,7 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
     emit TokenRevoked(tokenId, owner, msg.sender);
   }
 
-  function mintVerification() payable external {
-    // Put price to make request and mint NFT
+  function mintVerification() public payable {
     require(msg.value >= price, "IdentDeFI::mintVerification: Paid value is insufficiant");
     require(balanceOf(msg.sender) < 1, "IdentDeFI::mintVerification: Only 1 token per address allowed");
     bytes32 requestId = requestValidation();
@@ -116,6 +115,10 @@ contract IdentDeFi is ERC721URIStorage, Ownable, ChainlinkClient {
   function withdrawToken(address _tokenContract, uint _amount) external onlyOwner {
     require(_amount <= tokenBalance(_tokenContract), "IdentDeFI::withdrawToken: Insufficient balance");
     SafeTransfers.safeTransfer(_tokenContract, msg.sender, _amount);
+  }
+
+  receive() external payable {
+    mintVerification();
   }
 
   event ValidationSuccess(address indexed _account, uint indexed _tokenId);
